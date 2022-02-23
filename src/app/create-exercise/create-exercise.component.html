@@ -1,0 +1,77 @@
+<form (submit)="onSubmit()" [formGroup]="form">
+  <div class="mb-3">
+    <input type="text" placeholder="Template" class="form-control" formControlName="template">
+    <div *ngIf="form.get('template')?.invalid && form.get('template')?.touched">Please choose a
+      valid title</div>
+    <input type="text" placeholder="Title" class="form-control" formControlName="title">
+    <div *ngIf="form.get('title')?.invalid && form.get('title')?.touched">Please choose a
+      valid title</div>
+  </div>
+  <div class="mb-3">
+    <textarea placeholder="Your description" class="form-control" rows="2" formControlName="description"></textarea>
+    <div *ngIf="form.get('description')?.invalid && form.get('description')?.touched">
+      Please choose a valid title</div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <input type="text" class="form-control" placeholder="Sender display name" formControlName="senderDisplayName">
+      <div *ngIf="form.get('senderDisplayName')?.invalid && form.get('senderDisplayName')?.touched">
+        Please choose a valid title</div>
+    </div>
+    <div class="col">
+      <input type="text" class="form-control" placeholder="Sender email" formControlName="senderEmail">
+      <div *ngIf="form.get('senderEmail')?.invalid && form.get('senderEmail')?.touched">
+        Please choose a valid title</div>
+    </div>
+    <div class="col">
+      <input type="text" class="form-control" placeholder="My display name" formControlName="toDisplayName">
+      <div *ngIf="form.get('toDisplayName')?.invalid && form.get('toDisplayName')?.touched">
+        Please choose a valid title</div>
+    </div>
+    <div class="col">
+      <input type="text" class="form-control" placeholder="My email" formControlName="toEmail">
+      <div *ngIf="form.get('toEmail')?.invalid && form.get('toEmail')?.touched">Please
+        choose a valid title</div>
+    </div>
+    <div class="col">
+      <input type="text" class="form-control" placeholder="Time" formControlName="time">
+      <div *ngIf="form.get('time')?.invalid && form.get('time')?.touched">Please choose a
+        valid title</div>
+    </div>
+  </div>
+  <div class="mb-3">
+    <input type="text" placeholder="Subject" class="form-control" formControlName="object">
+    <div *ngIf="form.get('object')?.invalid && form.get('object')?.touched">Please choose
+      a valid title</div>
+  </div>
+  <div class="mb-3">
+    <textarea placeholder="Email body" class="form-control" rows="6" formControlName="body"></textarea>
+    <div *ngIf="form.get('body')?.invalid && form.get('body')?.touched">Please choose a
+      valid title</div>
+  </div>
+  <div class="mb-3">
+    <input type="text" placeholder="Right answer sentence" class="form-control" formControlName="rightAnswer">
+    <div *ngIf="form.get('rightAnswer')?.invalid && form.get('rightAnswer')?.touched">
+      Please choose a valid title</div>
+  </div>
+  <div class="mb-3">
+    <input type="text" placeholder="Wrong answer sentence" class="form-control" formControlName="wrongAnswer">
+    <div *ngIf="form.get('wrongAnswer')?.invalid && form.get('wrongAnswer')?.touched">
+      Please choose a valid title</div>
+  </div>
+  <div class="mb-3" formArrayName="answers">
+    <div *ngFor="let d of formAnswers.controls; index as i" [formGroupName]="i">
+      <div>
+        <input type="text" formControlName="id" placeholder="Id">
+        <input type="text" formControlName="text" placeholder="Text">
+        <a (click)="removeOrClearAnswer(i)">
+          <span>X</span>
+        </a>
+      </div>
+    </div>
+    <a (click)="addNewAnswer()">
+      Add new answer
+    </a>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>

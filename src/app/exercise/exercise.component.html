@@ -1,0 +1,97 @@
+<div *ngIf="template === 1" id="template-1" style="opacity: 1;"><span class="t" func="disableTooltip"></span>
+  <div class="part body">
+    <div class="container">
+      <h4>{{exercise.title}}</h4>
+      <div class="lead assignment">
+        <p>{{exercise.description}}</p>
+      </div>
+      <div class="lead animation" id="statement">
+        <div class="w-100 hidden show-1">
+          <div class="col-12" id="a" style="text-align:center;margin-bottom:10px"></div>
+        </div>
+        <div class="w-100 hidden show-2">
+          <div class="col-12" id="response" style="text-align:center;margin-bottom:10px"></div>
+        </div>
+      </div>
+      <div class="w-100" style="text-align:center;margin-bottom:10px"><button class="btn btn-nav btn-success" id="bl"
+          onclick="isLegitimate()" type="button">Legitimate</button> <button class="btn btn-nav btn-danger" id="bs"
+          onclick="isSuspicious()" type="button">Suspicious</button> <button class="btn btn-nav btn-primary" id="bv"
+          onclick="toValidate()" type="button" style="display:none">Validate</button> <button
+          class="btn btn-nav btn-primary" id="bn" onclick="goToNextPage()" type="button"
+          style="display:none">Next</button></div>
+    </div>
+  </div>
+  <div class="part">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="phone-container">
+            <div class="phone"><img src="./media/android-2.png" class="phone-image" id="default-screen-image"
+                width="680" height="1407"> <img src="./media/android-black.png" class="phone-image black-screen-image"
+                id="black-screen-image" onclick="unloadScreen(this)" ontouchstart="unloadScreen(this)" width="680"
+                height="1407">
+              <div class="screen">
+                <div class="phone-box" id="phone">
+                  <div class="phone-email">
+                    <div class="phone-banner">{{exercise.object}}</div>
+                    <div class="phone-header">
+                      <div style="padding:23px 21px 5px">
+                        <div style="display:flex;align-items:start">
+                          <div style="width:70px;position:relative;top:-5px"><svg class="clickable" height="70" id="2"
+                              style="enable-background:new 0 0 48 48" version="1.1" viewBox="0 0 48 48" width="70" x="0"
+                              xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
+                              xmlns:xlink="http://www.w3.org/1999/xlink" y="0">
+                              <style>.st0{fill:#4cdf16}.st2{fill:#fff;font-family:Calibri;text-transform:uppercase;font-size:19px}</style>
+                              <circle class="st0" cx="21" cy="21" r="21" transform="translate(1,2)"></circle><text
+                                class="st2" text-anchor="middle" x="45%" y="62%">{{exercise.digram}}</text>
+                            </svg></div>
+                          <div style="display:flex;justify-content:space-between;width:100%">
+                            <div class="outlook-ribbon undeployed" onclick="deploy(this)">
+                              <div><span class="clickable sender-displayname" id="3">{{exercise.senderDisplayName}}</span></div>
+                              <div><span class="clickable fold" id="7" style="font-size:18px;color:#888">{{exercise.toDisplayName}}</span>
+                              </div>
+                              <div class="unfold"><span class="clickable phone-sender-email" id="4">{{exercise.senderEmail}}</span>
+                              </div>
+                              <div style="position:absolute;top:22px;right:0"><img src="./media/dots.png"
+                                  style="top:5px;position:relative"></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="unfold">
+                          <div class="phone-detailed-unfold">
+                            <div class="phone-to">To</div><span class="phone-you">You</span> <span
+                              class="clickable phone-to-email" id="5">{{exercise.toEmail}}</span>
+                          </div>
+                        </div>
+                        <div class="phone-date-time"><span class="clickable" id="6">
+                            <div class="fold"
+                              style="position:relative;top:-73px;right:-496px;font-size:15px;color:#0178d4;text-align:right;width:70px">
+                              <span class="t"
+                                args="{&quot;d&quot;:&quot;4:02 PM&quot;,&quot;default&quot;:&quot;Yesterday&quot;,&quot;today&quot;:&quot;HH:mm&quot;}"
+                                func="writeRelativeDate">Yesterday</span></div>
+                            <div class="unfold phone-long-date"><span class="t"
+                                args="{&quot;d&quot;:&quot;4:02 PM&quot;,&quot;today&quot;:&quot;dddd, MMMM d, HH:mm&quot;}"
+                                func="writeRelativeDate">Wednesday, February 3, 16:02</span></div>
+                          </span></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="phone-email-body">{{exercise.body}}</div>
+                </div>
+                <div class="url-box" id="url-box"><img src="./media/android-url-info.png" class="pin-button">
+                  <p class="url-text" id="url-text">
+                    https://scorglobal.sharepoint.com/:u:/r/sites/FilesPortal/TechnicalArchitecture/SitePages/Secret-Management.aspx?csf=1&amp;web=1&amp;e=cSh08c
+                  </p><img src="./media/url.png" class="url-button">
+                </div>
+              </div>
+            </div>
+            <p class="phone-hour"><span class="t"
+                args="{&quot;d&quot;:&quot;0&quot;,&quot;format&quot;:&quot;HH:mm&quot;}" func="writeDate">21:26</span>
+            </p>
+            <p class="phone-battery">61%</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
