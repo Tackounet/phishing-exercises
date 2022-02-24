@@ -1,4 +1,5 @@
-<div *ngIf="template === 1" id="template-1" style="opacity: 1;"><span class="t" func="disableTooltip"></span>
+<div id="template-1" style="opacity:1" *ngIf="template === 1">
+  <span class="t" func="disableTooltip"></span>
   <div class="part body">
     <div class="container">
       <h4>{{exercise.title}}</h4>
@@ -46,7 +47,7 @@
                                 class="st2" text-anchor="middle" x="45%" y="62%">{{exercise.digram}}</text>
                             </svg></div>
                           <div style="display:flex;justify-content:space-between;width:100%">
-                            <div class="outlook-ribbon undeployed" onclick="deploy(this)">
+                            <div class="outlook-ribbon undeployed" (click)="toto()" #deploy>
                               <div><span class="clickable sender-displayname" id="3">{{exercise.senderDisplayName}}</span></div>
                               <div><span class="clickable fold" id="7" style="font-size:18px;color:#888">{{exercise.toDisplayName}}</span>
                               </div>
@@ -76,7 +77,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="phone-email-body">{{exercise.body}}</div>
+                  <div class="phone-email-body" [innerHTML]="exercise.body | noSanitize"></div>
                 </div>
                 <div class="url-box" id="url-box"><img src="./media/android-url-info.png" class="pin-button">
                   <p class="url-text" id="url-text">

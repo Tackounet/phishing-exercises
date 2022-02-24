@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { FunctionsService } from './functions.service';
 import { HttpClient } from '@angular/common/http';
 import { Exercise } from './exercise.model';
-import { Subject } from 'rxjs';
+import { Subject, TimeoutConfig } from 'rxjs';
 
 const URL_BACKEND = 'http://localhost:3000/api';
 
@@ -18,6 +18,32 @@ export class LibraryService {
   isLegitimate() { }
 
   validate() {
+  }
+
+  onDeploy(d: any) {
+    console.log("deploy");
+    let e: HTMLElement | null | undefined = d;
+    while ((e as HTMLElement).getAttribute('deployable') !== null && (e as HTMLElement).getAttribute('deployable') !== undefined && e?.id.split('-')[0] !== 'template') {
+      e = e?.parentElement;
+    }
+    console.log(e);
+    let classes = (e as HTMLElement).className.replaceAll(/ +/g, ' ').split(' ');
+    const fold = document.querySelectorAll(".fold");
+    const unfold = document.querySelectorAll(".unfold");
+    if (classes.includes('deployed')) {
+      classes = classes.filter(e => e !== 'deployed');
+      (e as HTMLElement).className = classes.join(' ') + ' undeployed';
+      fold.forEach(e => (e as HTMLElement).style.display = 'inline-block');
+      unfold.forEach(e => (e as HTMLElement).style.display = 'none');
+      console.log("fold");
+    } else {
+      classes = classes.filter(e => e !== 'undeployed');
+      (e as HTMLElement).className = classes.join(' ') + ' deployed';
+      fold.forEach(e => (e as HTMLElement).style.display = 'none');
+      unfold.forEach(e => (e as HTMLElement).style.display = 'inline-block');
+      console.log("unfold");
+    }
+    console.log("done");
   }
 
   getExercises() {

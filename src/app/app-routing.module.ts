@@ -6,8 +6,9 @@ import { SignupComponent } from './signup/signup.component';
 import { AuthComponent } from './auth/auth.component';
 
 const routes: Routes = [
+  // { path: '', component: ExerciseComponent },
   { path: 'admin/exercise', component: CreateExerciseComponent },
-  { path: 'exercise', component: ExerciseComponent },
+  { path: 'exercises', component: ExerciseComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'auth', component: AuthComponent },
 ];
