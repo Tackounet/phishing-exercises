@@ -1,0 +1,13 @@
+input.ng-invalid,
+textarea.ng-invalid {
+  outline: #ff4242 1px solid;
+}
+
+.space-top {
+  margin-top: 10px;
+}
+
+.space-high-top {
+  margin-top: 20px;
+  border: 1px solid #777;
+}

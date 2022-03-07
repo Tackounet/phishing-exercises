@@ -2,7 +2,10 @@ import { Injectable } from '@angular/core';
 import { FunctionsService } from './functions.service';
 import { HttpClient } from '@angular/common/http';
 import { Exercise } from './exercise.model';
-import { Subject, TimeoutConfig } from 'rxjs';
+import { map, Subject } from 'rxjs';
+import { Result } from './result.model';
+import { Score } from './score.model';
+import { Trainee } from './trainee.model';
 
 const URL_BACKEND = 'http://localhost:3000/api';
 
@@ -15,56 +18,56 @@ export class LibraryService {
 
   constructor(private http: HttpClient, private functionsService: FunctionsService) { }
 
-  isLegitimate() { }
-
-  validate() {
-  }
-
-  onDeploy(d: any) {
-    console.log("deploy");
-    let e: HTMLElement | null | undefined = d;
-    while ((e as HTMLElement).getAttribute('deployable') !== null && (e as HTMLElement).getAttribute('deployable') !== undefined && e?.id.split('-')[0] !== 'template') {
-      e = e?.parentElement;
-    }
-    console.log(e);
-    let classes = (e as HTMLElement).className.replaceAll(/ +/g, ' ').split(' ');
-    const fold = document.querySelectorAll(".fold");
-    const unfold = document.querySelectorAll(".unfold");
-    if (classes.includes('deployed')) {
-      classes = classes.filter(e => e !== 'deployed');
-      (e as HTMLElement).className = classes.join(' ') + ' undeployed';
-      fold.forEach(e => (e as HTMLElement).style.display = 'inline-block');
-      unfold.forEach(e => (e as HTMLElement).style.display = 'none');
-      console.log("fold");
-    } else {
-      classes = classes.filter(e => e !== 'undeployed');
-      (e as HTMLElement).className = classes.join(' ') + ' deployed';
-      fold.forEach(e => (e as HTMLElement).style.display = 'none');
-      unfold.forEach(e => (e as HTMLElement).style.display = 'inline-block');
-      console.log("unfold");
-    }
-    console.log("done");
-  }
-
   getExercises() {
-    this.http.get<{ message: string, exercises: Exercise[] }>(`${URL_BACKEND}/exercises`)
-      .subscribe(response => {
-        this.exercises = response.exercises;
-        console.log(response);
+    this.http.get<{ message: string, exercises: any }>(`${URL_BACKEND}/exercises`)
+      .pipe(map(exercisesResponse => {
+        return exercisesResponse.exercises.map((exercise: any) => {
+          return {
+            id: exercise._id,
+            template: exercise.template,
+            title: exercise.title,
+            description: exercise.description,
+            digram: exercise.digram,
+            object: exercise.object,
+            senderDisplayName: exercise.senderDisplayName,
+            senderEmail: exercise.senderEmail,
+            time: exercise.time,
+            toDisplayName: exercise.toDisplayName,
+            toEmail: exercise.toEmail,
+            body: exercise.body + '<div id="loaded"></div>',
+            legitimate: exercise.legitimate,
+            rightAnswer: exercise.rightAnswer,
+            wrongAnswer: exercise.wrongAnswer
+          };
+        })
+      }))
+      .subscribe(exercises => {
+        this.exercises = exercises;
         this.exercisesSubject.next([...this.exercises]);
       });
   }
 
   addExercise(exercise: Exercise) {
-    this.http.post<{ message: string }>(`${URL_BACKEND}/exercise`, exercise)
+    return this.http.post<{ message: string, exercise: Exercise }>(`${URL_BACKEND}/exercises`, exercise);
+  }
+
+  getExercise(id: string) {
+    return this.http.get<{ message: string, exercise: Exercise }>(`${URL_BACKEND}/exercises/${id}`);
+  }
+
+  updateExercise(id: string, exercise: Exercise) {
+    return this.http.put<{ message: string, exercise: Exercise }>(`${URL_BACKEND}/exercises/${id}`, exercise);
+  }
+
+  sendExerciseScore(score: Result) {
+    this.http.post<{ message: string, result: Result }>(`${URL_BACKEND}/trainees/result`, score)
       .subscribe(response => {
         console.log(response);
       });
   }
 
-  updateExercise(exercise: Exercise) {
-    const id = 0;
-    this.http.patch<{ message: string }>(`${URL_BACKEND}/exercise/${id}`, exercise)
+  sendStats(stats: Score) {
+    this.http.post<{ message: string }>(`${URL_BACKEND}/trainees/stats`, stats)
       .subscribe(response => {
         console.log(response);
       });
@@ -72,6 +75,24 @@ export class LibraryService {
 
   getExercisesListener() {
     return this.exercisesSubject.asObservable();
+  }
+
+  registerTrainee(trainee: Trainee) {
+    this.http.post<{ message: string }>(`${URL_BACKEND}/trainees/register`, trainee)
+      .subscribe(response => {
+        console.log(response);
+      });
+  }
+
+  registerSession(id: string) {
+    this.http.post<{ message: string }>(`${URL_BACKEND}/sessions`, {id: id})
+      .subscribe(response => {
+        console.log(response);
+      });
+  }
+
+  getSession() {
+    return this.http.get<{ message: string, sessionId: string }>(`${URL_BACKEND}/sessions`);
   }
 
   private decodeHTML(str: string | null): string {
@@ -88,15 +109,16 @@ export class LibraryService {
   }
 
   render(text: any) {
+    console.log("render: " + text);
     const re = /<<([^(]+)\(([^>]+)\)>>/g;
     let ret = text;
     let match;
     do {
       match = re.exec(text);
       if (match) {
-        // console.log("test: " + match[0]);
+        console.log("test: " + match[0]);
         ret = ret.replaceAll(match[0], this.dispatch(this.decodeHTML(match[1]), JSON.parse(this.decodeHTML(match[2]))));
-        // this.dispatch(this.decodeHTML(match[1]), JSON.parse(this.decodeHTML(match[2])));
+        this.dispatch(this.decodeHTML(match[1]), JSON.parse(this.decodeHTML(match[2])));
       }
     } while (match);
     return ret;

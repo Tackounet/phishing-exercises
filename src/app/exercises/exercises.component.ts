@@ -1,17 +1,20 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild, Input, AfterViewChecked } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, AfterViewChecked } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Exercise } from '../exercise.model';
 import { LibraryService } from '../library.service';
+import { Result } from '../result.model';
+import { Score } from '../score.model';
+import { Trainee } from '../trainee.model';
+import { v4 as uuidv4 } from 'uuid';
 
-declare const bootstrap: any
+declare const bootstrap: any;
 
 @Component({
-  selector: 'app-exercise',
-  templateUrl: './exercise.component.html',
-  styleUrls: ['./exercise.component.css']
+  selector: 'app-exercises',
+  templateUrl: './exercises.component.html',
+  styleUrls: ['./exercises.component.css']
 })
-export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class ExercisesComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('main') main!: ElementRef;
   @ViewChild('urlText') urlText!: ElementRef;
   @ViewChild('blackScreenImage') blackScreenImage!: ElementRef;
@@ -22,14 +25,15 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('buttons') buttons!: ElementRef;
   @ViewChild('btnLegitimate') btnLegitimate!: ElementRef;
   @ViewChild('btnSuspicious') btnSuspicious!: ElementRef;
+  @ViewChild('btnNext') btnNext!: ElementRef;
   @ViewChild('btnValidate') btnValidate!: ElementRef;
   @ViewChild('email') email!: ElementRef;
   @ViewChild('proposal') proposal!: ElementRef;
 
-  @Input() exercisePreview!: Exercise;
-
+  duration: number = 5;
   private timeoutId?: ReturnType<typeof setTimeout>;
   private exerciseTimeout?: ReturnType<typeof setTimeout>;
+  private timeout: number = this.duration * 60000 + 10000;
   private mouseDown: boolean = false;
   private timeoutMouse?: ReturnType<typeof setTimeout>;
   private pointSuccessLegitimate: number = 10;
@@ -39,6 +43,7 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
   template: number = 0;
   private contentIsLoaded = false;
   private exercisesSub: Subscription = Subscription.EMPTY;
+  private exercises: Exercise[] = [];
   exercise: Exercise = {
     id: '',
     template: 0,
@@ -62,29 +67,43 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
       items: []
     }
   };
-  private id: string = '';
   private y: number = 0;
   private numberOfClickedItems: number = 0;
   private lockClock = 0;
   private delay = 500;
+  private currentExercise: number = 0;
+  exercisesNumber: number = 0;
   senderColor: string = this.generateHTMLColor();
   private exerciseScore: number = 0;
+  totalScore: number = 0;
+  private sessionId: string = '';
+  trainee: Trainee = {
+    id: uuidv4(),
+    name: ''
+  };
   private isCorrect: boolean | null = null;
   private isPhishing: boolean | null = null;
   deploy = false;
-  private isPreview = false;
+  userRegistered: boolean = false;
+  exerciseStarted: boolean = false;
+  registerText: string = 'Please enter your name';
+  registerButton: string = 'Register';
+  username: string = '';
+  endMessage = 'Sorry, the time is over';
+  terminate: boolean = false;
+  correctAnalysisNumber: number = 0;
 
-  constructor(private route: ActivatedRoute, private libraryService: LibraryService, private elRef: ElementRef) { }
+  constructor(private libraryService: LibraryService) { }
 
   ngAfterViewChecked(): void {
-    console.log('ngAfterViewChecked');
     this.loadAllContent();
   }
 
   loadAllContent() {
     if (this.contentIsLoaded) { return; }
+    if (!this.email) { return; }
     const loaded = this.email.nativeElement.querySelectorAll('#loaded');
-    if (loaded) {
+    if (loaded.length > 0) {
       this.initBody(this);
       this.contentIsLoaded = true;
       loaded[0].remove();
@@ -92,87 +111,25 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.proposal.nativeElement.querySelectorAll('.proposal').forEach((e: HTMLElement) => {
         e.style.opacity = '0';
       });
-      if (this.exercisePreview) {
-        this.displayButtons('block');
-      }
     } else {
       console.log('not loaded');
     }
   }
 
-  private loadExercise() {
-    this.libraryService.getExercise(this.id).subscribe(response => {
-      this.exercise = response.exercise;
-      this.exerciseScore = 0;
-      this.template = this.exercise.template;
-      this.exercise.body = this.libraryService.render(this.exercise.body);
-      this.exercise.object = this.libraryService.render(this.exercise.object);
-      this.exercise.description = this.libraryService.render(this.exercise.description);
-      this.exercise.toDisplayName = this.libraryService.render(this.exercise.toDisplayName);
-      // console.log(context.exercise);
-    });
-    // this.exercisesSub = this.libraryService.getExerciseListener()
-    //   .subscribe((exercises: Exercise[]) => {
-    //     // this.loadAllContent();
-    //   });
-  }
-
   ngOnInit(): void {
-    // this.route.paramMap.subscribe((param: ParamMap) => {
-    //   this.createMode = !(param.has('id'));
-    //   if (this.createMode) {
-    //     this.id = null;
-    //   } else {
-    //     this.isLoading = true;
-    //     this.id = param.get('id');
-    //     this.campaignService.getCampaign(this.id).subscribe((campaign: { campaign: Campaign }) => {
-    //       this.campaign = campaign.campaign;
-    //       this.tags = this.campaign.tags
-    //       this.hide = this.campaign.hide;
-    //       this.form.patchValue({
-    //         title: this.campaign.title,
-    //         authors: this.campaign.authors,
-    //         description: this.campaign.description,
-    //         images: this.campaign.images,
-    //         mapsNumber: this.campaign.mapsNumber,
-    //         mapsStatus: this.campaign.mapsStatus,
-    //         mapsProgress: this.campaign.mapsProgress,
-    //         downloadInfo: this.campaign.downloadInfo,
-    //         source: this.campaign.source,
-    //         rate: this.campaign.rate,
-    //         tags: this.tags
-    //       });
-    //       for (let i = 1; i < this.campaign.images.length; ++i) {
-    //         this.addElement('images', this.campaign.images[i].link);
-    //       }
-    //       for (let i = 1; i < this.campaign.downloadInfo.length; ++i) {
-    //         this.addElement('downloadInfo', this.campaign.downloadInfo[i]);
-    //       }
-    //       this.isLoading = false;
-    //     });
-    //   }
-    // });
-
-
-    if (this.exercisePreview) {
-      console.log("init");
-      this.exerciseScore = 0;
-      console.log(this.exercisePreview);
-      this.exercise = this.exercisePreview;
-      this.template = this.exercise.template;
-      this.exercise.body = this.libraryService.render(this.exercise.body);
-      this.exercise.object = this.libraryService.render(this.exercise.object);
-      this.exercise.description = this.libraryService.render(this.exercise.description);
-      this.exercise.toDisplayName = this.libraryService.render(this.exercise.toDisplayName);
-      this.isPreview = true;
-    } else {
-      this.id = this.route.snapshot.params['id'];
-      this.loadExercise();
-      this.route.params.subscribe((params: Params) => {
-        this.id = params['id'];
-        this.loadExercise();
-      });
-    }
+    this.libraryService.getExercises();
+    this.exercisesSub = this.libraryService.getExercisesListener()
+    .subscribe((exercises: Exercise[]) => {
+        console.log("sub");
+        this.exercises = this.shuffleArray(exercises);
+        this.exercisesNumber = this.exercises.length;
+        this.setExercise(this);
+    });
+    this.libraryService.getSession().subscribe(response => {
+      console.log(response.message);
+      this.sessionId = response.sessionId;
+      console.log('session: ' + this.sessionId);
+    });
   }
 
   ngOnDestroy(): void {
@@ -181,24 +138,71 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
-  // private setExercise(context: any) {
-  //   context.exerciseScore = 0;
-  //   context.exercise = context.exercises[context.currentExercise];
-  //   context.template = parseInt(context.exercise.template);
-  //   context.exercise.body = this.libraryService.render(context.exercise.body);
-  //   context.exercise.object = this.libraryService.render(context.exercise.object);
-  //   console.log(context.exercise);
-  // }
+  register() {
+    this.registerText = 'Your name';
+    this.registerButton = 'Change name';
+    this.trainee.name = this.username.trim();
+    this.userRegistered = true;
+  }
 
-  private onDeploy(d: Event) {
+  start() {
+    this.exerciseStarted = true;
+    this.libraryService.registerTrainee(this.trainee);
+    const timeExpiration = () => this.displayStats();
+    this.exerciseTimeout = setTimeout(timeExpiration, this.timeout);
+  }
+
+  private setExercise(context: any) {
+    context.exerciseScore = 0;
+    context.exercise = context.exercises[context.currentExercise];
+    console.log(context.exercise.body);
+    context.template = parseInt(context.exercise.template);
+    context.exercise.body = context.libraryService.render(context.exercise.body);
+    context.exercise.object = context.libraryService.render(context.exercise.object);
+    context.exercise.description = context.libraryService.render(context.exercise.description);
+    context.exercise.toDisplayName = context.libraryService.render(context.exercise.toDisplayName);
+    console.log(context.exercise);
+  }
+
+  private shuffleArray(array: Exercise[]) {
+    let curId: number = array.length;
+    while (0 !== curId) {
+      const randId = Math.floor(Math.random() * curId);
+      curId -= 1;
+      const tmp = array[curId];
+      array[curId] = array[randId];
+      array[randId] = tmp;
+    }
+    return array;
+  }
+
+  private sendScore() {
+    const result: Result = {
+      exerciseId: this.exercise.id,
+      exerciseTitle: this.exercise.title,
+      traineeId: this.trainee.id,
+      traineeName: this.trainee.name,
+      sessionId: this.sessionId,
+      score: this.exerciseScore,
+      isCorrect: this.isCorrect,
+      isPhishing: this.isPhishing
+    };
+    this.libraryService.sendExerciseScore(result);
+  }
+
+  private onDeploy(d: Event, context: any) {
+    console.log(d);
     console.log("deploy");
+    // return;
     let e: HTMLElement | null | undefined = (d.target as HTMLElement);
     while (e?.getAttribute('fn') !== "deployable" && e?.className !== 'template') {
+      console.log(e);
       e = e?.parentElement;
     }
     let classes = e.className.replaceAll(/ +/g, ' ').split(' ');
-    const fold = this.email.nativeElement.querySelectorAll(".fold");
-    const unfold = this.email.nativeElement.querySelectorAll(".unfold");
+    console.log(context.email);
+    const fold = context.email.nativeElement.querySelectorAll(".fold");
+    const unfold = context.email.nativeElement.querySelectorAll(".unfold");
     if (classes.includes('deployed')) {
       classes = classes.filter(e => e !== 'deployed');
       e.className = classes.join(' ') + ' undeployed';
@@ -249,13 +253,14 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
     context.btnLegitimate.nativeElement.style.display = 'inline';
     context.btnSuspicious.nativeElement.style.display = 'inline';
     context.btnValidate.nativeElement.style.display = 'none';
+    context.btnNext.nativeElement.style.display = 'none';
     context.answer.nativeElement.innerHTML = '';
     context.response.nativeElement.innerHTML = '';
     context.statement.nativeElement.style.height = '0px';
     context.response.nativeElement.opacity = 0;
 
     if (context.template !== 0) {
-      this.email.nativeElement.querySelectorAll('[data-bs-toggle]').forEach((e: HTMLElement) => {
+      context.email.nativeElement.querySelectorAll('[data-bs-toggle]').forEach((e: HTMLElement) => {
         const title = e.getAttribute('title');
         const t = title === null ? '' : title;
         e.setAttribute('bs-title', t);
@@ -267,11 +272,11 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
         e.addEventListener('touchend', () => context.clearUrl(context));
         e.addEventListener('touchleave', () => context.clearUrl(context));
       });
-      this.email.nativeElement.querySelectorAll('[fn="deployable"]').forEach((e: HTMLElement) => {
-        e.addEventListener('mouseup', context.onDeploy);
+      context.email.nativeElement.querySelectorAll('[fn="deployable"]').forEach((e: HTMLElement) => {
+        e.addEventListener('mouseup', (e: Event) => context.onDeploy(e, context));
       });
     } else {
-      const tooltipTriggerList = [].slice.call(this.email.nativeElement.querySelectorAll('[data-bs-toggle="tooltip"]'))
+      const tooltipTriggerList = [].slice.call(context.email.nativeElement.querySelectorAll('[data-bs-toggle="tooltip"]'))
       tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
       });
@@ -337,18 +342,21 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
   isLegitimate() {
     if (this.exercise.legitimate) {
       this.answer.nativeElement.innerHTML = this.exercise.rightAnswer.text;
+      ++this.correctAnalysisNumber;
       this.isCorrect = true;
       this.isPhishing = false;
       this.exerciseScore = this.pointSuccessLegitimate;
+      this.totalScore += this.exerciseScore;
+      this.sendScore();
     } else {
       this.answer.nativeElement.innerHTML = this.exercise.wrongAnswer.text;
       this.isCorrect = false;
       this.isPhishing = true;
       this.exerciseScore = this.pointFailSuspicious;
+      this.totalScore += this.exerciseScore;
+      this.sendScore();
     }
-    if (this.isPreview) {
-      this.displayButtons('none');
-    }
+    this.swapButtons(this.btnNext);
     this.rewriteStatement();
   }
 
@@ -382,24 +390,22 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.isCorrect = false;
       this.isPhishing = false;
       this.exerciseScore = this.pointFailLegitimate;
-      if (this.isPreview) {
-        this.displayButtons('none');
-      }
+      this.totalScore += this.exerciseScore;
+      this.sendScore();
+      this.swapButtons(this.btnNext);
     }
     this.rewriteStatement();
   }
 
   toValidate() {
-    if (this.isPreview) {
-      this.displayButtons('none');
-    }
+    this.swapButtons(this.btnNext);
     this.email.nativeElement.querySelectorAll('.clickable').forEach((e: HTMLElement) => {
       e.style.cursor = 'auto';
     });
-    // this.email.nativeElement.querySelectorAll('.clickable').forEach((e: HTMLElement) => {
-    //   const new_element = e.cloneNode(true);
-    //   e.parentNode?.replaceChild(new_element, e);
-    // });
+    this.email.nativeElement.querySelectorAll('.clickable').forEach((e: HTMLElement) => {
+      const new_element = e.cloneNode(true);
+      e.parentNode?.replaceChild(new_element, e);
+    });
     const allRightAnswers: any = {};
     const allWrongAnswers: any = {};
     if (this.exercise.rightAnswer.items) {
@@ -417,16 +423,13 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
       });
     }
 
-    this.main.nativeElement.querySelectorAll('.clicked').forEach((e: HTMLElement) => {
+    this.email.nativeElement.querySelectorAll('.clicked').forEach((e: HTMLElement) => {
       const attr: string | null = e.getAttribute('answer');
       const answer: string = attr === null ? '' : attr;
       const color = (answer in allRightAnswers) ? '#64f3b0' : '#ffa4a4';
       if (e.classList.contains('clickable')) {
         e.style.outline = color + ' solid 2px';
         e.style.backgroundColor = color;
-      } else if (e.classList.contains('proposal')) {
-        e.getElementsByTagName('label')[0].style.backgroundColor = color;
-        e.getElementsByTagName('label')[0].style.color = '#212529';
       } else {
         Array.from(e.children).forEach(element => {
           e.style.backgroundColor = color;
@@ -478,7 +481,8 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     if (displayWrongAnswer) {
       if (message !== '') {
-        message += '.</span> <span style="color:#f33">However';
+        message +=
+          '.</span> <span style="color:#f33">However';
       } else {
         message = '<p><span style="color:#f33">Sorry';
       }
@@ -504,23 +508,24 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     this.isPhishing = true;
+    this.totalScore += this.exerciseScore;
+    if (this.isCorrect) {
+      ++this.correctAnalysisNumber;
+    }
+    this.sendScore();
     return message + '.</span></p>';
   }
 
   switchClick(e: Event) {
-    console.log('switch');
     this.turnClick(e, this);
   }
 
   turnClick(e: Event, context: any) {
-    console.log('turn');
     let element: HTMLElement | null | undefined = (e.target as HTMLElement);
     while (!element?.getAttribute('answer') && element?.className !== 'template') {
       element = element?.parentElement;
     }
-    console.log('click');
     if (element.className === 'template') { return; }
-    console.log('clicked?');
     if (element.classList.contains('clicked')) {
       --context.numberOfClickedItems;
       console.log('remove answer: ' + element.getAttribute('answer'));
@@ -533,7 +538,6 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
       element.classList.add('clicked');
     }
     e.stopPropagation();
-    console.log('validate?');
     context.btnValidate.nativeElement.disabled = context.numberOfClickedItems == 0;
   }
 
@@ -552,4 +556,33 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
       }, 200);
     }, 200);
   }
+
+  private displayStats() {
+    console.log(this.totalScore);
+    this.terminate = true;
+    const stats: Score = {
+      sessionId: this.sessionId,
+      traineeId: this.trainee.id,
+      traineeName: this.trainee.name,
+      score: this.totalScore
+    };
+    this.libraryService.sendStats(stats);
+  }
+
+  goToNextPage() {
+    if (this.lockClock < (Date.now() - this.delay)) {
+      this.lockClock = Date.now();
+      ++this.currentExercise;
+      if (this.currentExercise < this.exercisesNumber) {
+        this.main.nativeElement.style.opacity = 0;
+        this.contentIsLoaded = false;
+        const that = this;
+        setTimeout(this.setExercise, 500, that);
+      } else {
+        this.endMessage = 'You have done the exercises!';
+        this.displayStats();
+      }
+    }
+  }
 }
+

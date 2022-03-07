@@ -1,1 +1,789 @@
-/* You can add global styles to this file, and also import other style files */
+.default {
+  background-color: #fff;
+}
+
+strong {
+  color: #006a8d
+}
+
+.email-body strong {
+  color: #212529;
+  text-align: left;
+}
+
+.time {
+  display: flex;
+  width: 200px;
+  height: 40px;
+  position: relative;
+  align-items: center;
+  max-width: 150px;
+  padding-left: 10px;
+  color: #fff;
+}
+
+.time:after {
+  content: "";
+  position: absolute;
+  right: -20px;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-right: 20px solid transparent;
+  border-top: 20px solid #006a8d;
+  border-bottom: 20px solid #006a8d;
+}
+
+.block {
+  padding-bottom: 15px;
+  border-bottom: 1px solid #006a8d;
+}
+
+.body {
+  outline-color: transparent;
+  background-color: #e9ecef;
+}
+
+.bg-scor,
+.time {
+  background-color: #006a8d !important;
+}
+
+.btn-finish {
+  width: 100px;
+}
+
+.template,
+.btn-finish,
+.proposal,
+.circle-icon,
+.circle-text,
+.circle-info-half {
+  opacity: 0;
+}
+
+.template h4 {
+  color: #006a8d
+}
+
+.template h4:first-of-type {
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+
+.template,
+.btn-finish,
+button.btn-nav,
+.circle-icon,
+.circle-text,
+.circle-info-half {
+  transition: opacity 0.4s;
+}
+
+.assignment {
+  font-family: Amiri, serif;
+  text-align: center;
+  font-size: 24px;
+  line-height: 28px;
+  margin-bottom: 1rem;
+}
+
+.part.body .btn-primary {
+  color: #fff;
+  background-color: #006a8d;
+  border-color: #006a8d
+}
+
+.part.body .btn-primary:hover {
+  color: #fff;
+  background-color: #005069;
+  border-color: #003546
+}
+
+.part.body .btn-primary.focus,
+.part.body .btn-primary:focus {
+  color: #fff;
+  background-color: #005069;
+  border-color: #003546;
+  box-shadow: 0 0 0 .2rem rgba(0, 107, 141, .5);
+}
+
+.part.body .btn-primary.disabled,
+.part.body .btn-primary:disabled {
+  color: #fff;
+  background-color: #8cc3d5;
+  border-color: #8cc3d5;
+}
+
+.part.body .btn-primary:not(:disabled):not(.disabled).active,
+.part.body .btn-primary:not(:disabled):not(.disabled):active,
+.show>.part.body .btn-primary.dropdown-toggle {
+  color: #fff;
+  background-color: #04485d;
+  border-color: #032e3c
+}
+
+.part.body .btn-primary:not(:disabled):not(.disabled).active:focus,
+.part.body .btn-primary:not(:disabled):not(.disabled):active:focus,
+.show>.part.body .btn-primary.dropdown-toggle:focus {
+  box-shadow: 0 0 0 .2rem rgba(0, 107, 141, .5);
+}
+
+.hint-display .proposal-body>div {
+  transition: opacity 0.8s;
+}
+
+.arrow::before {
+  display: none;
+}
+
+.card.side {
+  /* background-color: #f9f9f9; */
+  text-align: center;
+  padding: 10px;
+}
+
+.card-proposal .row {
+  font-size: .9rem;
+  position: relative
+}
+
+.no-hint {
+  position: absolute;
+  font-size: 24px;
+  padding: 50px 50px 0
+}
+
+.proposal .btn-check:active+.btn-outline-primary,
+.proposal .btn-check:checked+.btn-outline-primary,
+.proposal .btn-outline-primary.active,
+.proposal .btn-outline-primary.dropdown-toggle.show,
+.proposal .btn-outline-primary:active {
+  color: #fff;
+  background-color: #006a8d;
+  border-color: #006a8d;
+}
+
+.proposal .btn-outline-primary {
+  color: #006a8d;
+  border-color: #006a8d;
+}
+
+.proposal.clicked .btn-outline-primary {
+  color: #fff;
+  border-color: #006a8d;
+  background: #006a8d;
+}
+
+.proposal:hover .btn-outline-primary {
+  background-color: #005069;
+  border-color: #003546
+}
+
+.proposal>div>div {
+  padding: 6px 15px;
+}
+
+.proposal+.proposal {
+  margin-top: 15px
+}
+
+.proposal.hh:hover>.card {
+  background-color: #cacaca;
+}
+
+.proposal.clicked>.card {
+  background-color: #ffd06a;
+}
+
+.proposal.clicked.hh:hover>.card {
+  background-color: #cca143;
+}
+
+.hint+.hint,
+.hint-display {
+  padding-top: 15px;
+}
+
+.hint .proposal-body {
+  text-align: center;
+  cursor: help;
+  color: #fff;
+  background-color: #00A2BD;
+  transition: all 0.4s;
+  text-transform: uppercase;
+}
+
+.hint .proposal-body:hover {
+  border-color: #fff;
+  background-color: #00557F;
+}
+
+.hint-display .proposal-body {
+  position: relative;
+}
+
+.hint-display .proposal-body>div {
+  position: absolute;
+  top: 7px;
+  opacity: 0;
+  color: #000;
+  padding: 0 20px;
+}
+
+.hint-display .proposal-body>div p {
+  margin-bottom: 10px;
+}
+
+.hint-display .proposal-body>div ul {
+  padding: 0;
+}
+
+.hint-display .proposal-body>div ul li {
+  margin-left: 15px;
+  list-style-type: none;
+  position: relative;
+}
+
+.hint-display .proposal-body>div ul li::before {
+  content: '⬥';
+  position: absolute;
+  top: 2px;
+  left: -15px;
+  font-size: 12px;
+  color: #006a8d;
+}
+
+.hint-display .proposal-body>div ul li+li {
+  margin-top: 10px;
+}
+
+.hint-display .proposal-body>div#hint-default {
+  opacity: 1;
+}
+
+.attachment {
+  cursor: pointer;
+  padding: 5px;
+  opacity: 1;
+  border: 1px solid transparent;
+  transition: all .2s;
+}
+
+.attachment:hover {
+  opacity: .8;
+  border: 1px solid #eee;
+}
+
+.animation {
+  overflow: hidden;
+  transition: height 0.25s ease-out;
+  height: auto;
+}
+
+button.btn-nav {
+  margin: 0 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.part {
+  padding: 20px 0 5px;
+}
+
+.clickable.clicked {
+  outline: #ffd06a solid 3px;
+  background-color: #ffd06a;
+}
+
+.clicked,
+.clickable {
+  outline-color: transparent;
+}
+
+.clicked,
+.clickable,
+.no-hint,
+.proposal,
+.proposal>.card {
+  transition: all 0.4s;
+}
+
+.proposal>.card {
+  display: block;
+}
+
+.link {
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link.button-link {
+  text-decoration: none;
+}
+
+.tooltip-inner {
+  max-width: 500px !important;
+  width: max-content !important;
+  background-color: #fff !important;
+  color: #000 !important;
+  opacity: 1 !important;
+  border: 1px solid #c8c8c8 !important;
+  box-shadow: 1px 1px 4px #aaa !important;
+}
+
+.tooltip.bs-tooltip-end .tooltip-arrow::before {
+  border-right-color: transparent !important;
+}
+
+.tooltip.bs-tooltip-start .tooltip-arrow::before {
+  border-left-color: transparent !important;
+}
+
+.tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+  border-bottom-color: transparent !important;
+}
+
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+  border-top-color: transparent !important;
+}
+
+@media (max-width: 320px) {
+  .tooltip-inner {
+    min-width: initial;
+    max-width: 320px !important;
+  }
+}
+
+.circliful {
+  position: relative;
+}
+
+.circle-icon {
+  position: absolute;
+  width: 26px;
+  left: 107px;
+  top: 65px;
+}
+
+.circle-text,
+.circle-info,
+.circle-text-half,
+.circle-info-half {
+  width: 100%;
+  position: absolute;
+  text-align: center;
+  display: inline-block;
+}
+
+.circle-info {
+  color: #999;
+}
+
+.col-12.order-lg-2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+@media (max-width:991px) {
+  .col-12.order-lg-2 svg {
+    max-height: 300px;
+  }
+}
+
+@media (min-width:992px) {
+  .col-12.order-lg-2 {
+    margin-bottom: 0;
+  }
+}
+
+.phone-container {
+  display: flex;
+  justify-content: center;
+}
+
+.phone {
+  width: 705px;
+  height: 1407px;
+  position: relative;
+}
+
+.phone-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.phone-box {
+  position: absolute;
+  height: 993px;
+  width: 680px;
+  top: 131px;
+  left: 0;
+  overflow: hidden;
+  overflow-y: scroll;
+}
+
+.phone-battery,
+.phone-hour {
+  position: absolute;
+  z-index: 3;
+  top: 42px;
+  color: #fff;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 20px;
+}
+
+.phone-hour {
+  left: 60px;
+}
+
+.iphone-hour {
+  position: relative;
+  top: 40px;
+  left: 72px;
+  color: #000;
+  font-size: 19px;
+  width: 100px;
+  text-align: center;
+  z-index: 1;
+}
+
+.phone-battery {
+  left: 559px;
+}
+
+.phone-email {
+  position: relative;
+  left: 0;
+}
+
+.outlook-ribbon,
+.ioutlook-ribbon {
+  flex-grow: 1;
+  position: relative;
+  cursor: pointer;
+}
+
+.outlook-ribbon {
+  padding: 0 15px;
+  top: -4px;
+}
+
+.ioutlook-ribbon {
+  padding: 10px;
+  line-height: 31px;
+}
+
+.unfold {
+  display: none;
+}
+
+.clicked>.fold,
+.clicked>.unfold {
+  background-color: #ffd06a;
+}
+
+.outlook-ribbon .sender-displayname,
+.ioutlook-ribbon .isender-displayname {
+  transition: color 0s;
+}
+
+.outlook-ribbon .sender-displayname {
+  font-size: 20px;
+}
+
+.outlook-ribbon.undeployed .sender-displayname {
+  color: #888;
+}
+
+.outlook-ribbon.deployed .sender-displayname,
+.ioutlook-ribbon.deployed .isender-displayname {
+  color: #0178d4;
+}
+
+.ioutlook-ribbon .isender-displayname {
+  font-size: 26px;
+}
+
+.ioutlook-ribbon.undeployed .isender-displayname {
+  color: #222;
+}
+
+.phone-detailed-unfold,
+.iphone-detailed-unfold {
+  display: flex;
+  color: #888;
+  position: relative;
+}
+
+.phone-detailed-unfold {
+  font-size: 17px;
+  top: 4px;
+}
+
+.iphone-detailed-unfold {
+  font-size: 23px;
+  top: 2px;
+}
+
+.phone-sender-email,
+.iphone-sender-email {
+  color: #666;
+}
+
+.phone-sender-email {
+  font-size: 17.4px;
+}
+
+.iphone-sender-email {
+  font-size: 23px;
+}
+
+.phone-you,
+.iphone-you {
+  color: #0178d4;
+}
+
+.phone-you {
+  font-size: 18px;
+}
+
+.iphone-you {
+  font-size: 23px;
+}
+
+.phone-to,
+.iphone-to {
+  color: #111;
+}
+
+.phone-to {
+  padding: 0px 24px 0 43px;
+}
+
+.iphone-to {
+  padding: 0px 18px 0 32px;
+}
+
+.phone-to-email,
+.iphone-to-email {
+  color: #666;
+}
+
+.phone-to-email {
+  font-size: 15px;
+  padding: 4px 0 0 6px;
+}
+
+.iphone-to-email {
+  font-size: 20px;
+  padding: 4px 0 0 7px;
+}
+
+.phone-email,
+.url-box {
+  font-family: 'Roboto', sans-serif;
+}
+
+.iphone-email,
+.iurl-box {
+  font-family: 'Lexend Deca', sans-serif;
+}
+
+.phone-long-date,
+.iphone-long-date {
+  color: #666;
+  border-bottom: 2px solid #eee;
+  margin-bottom: 18px;
+}
+
+.phone-long-date {
+  font-size: 17.4px;
+  padding: 9px 0px 38px 86px;
+}
+
+.iphone-long-date {
+  font-size: 23px;
+  padding: 27px 0px 40px 81px;
+}
+
+.screen,
+.iscreen {
+  position: absolute;
+  top: 35px;
+  height: 1279px;
+}
+
+.screen {
+  left: 34px;
+}
+
+.iscreen {
+  left: 46px;
+}
+
+.url-box,
+.iurl-box {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  text-align: center;
+  max-height: 0;
+  overflow: hidden;
+}
+
+.url-box {
+  border-radius: 16px 16px 0 0;
+  background-color: #fff;
+  z-index: 2;
+}
+
+.iurl-box {
+  color: #0178d4;
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
+  z-index: 1;
+}
+
+.iphone-box {
+  position: absolute;
+  height: 992px;
+  width: 660px;
+  top: 132px;
+  left: 0;
+  overflow: hidden;
+  overflow-y: scroll;
+}
+
+.black-screen-image {
+  display: none;
+  opacity: 0;
+  z-index: 1;
+  transition: opacity 0.2s ease-out;
+}
+
+.phone-banner,
+.iphone-banner {
+  text-align: start;
+  color: #444;
+  background-color: #f8f8f8;
+  border-bottom: 2px solid #eee;
+}
+
+.phone-banner {
+  font-size: 20px;
+  font-family: 'Roboto', sans-serif;
+  padding: 27px 23px;
+}
+
+.iphone-banner {
+  font-size: 26px;
+  padding: 25px;
+}
+
+.phone-email,
+.screen,
+.phone-email-body,
+.url-box {
+  width: 613px;
+}
+
+.iphone-email,
+.iscreen,
+.iphone-email-body,
+.iurl-box {
+  width: 589px;
+}
+
+.phone-email-body,
+.iphone-email-body {
+  padding: 0 10px;
+}
+
+.url-text,
+.iurl-text {
+  word-break: break-word;
+}
+
+.url-text {
+  padding: 17px 23px;
+  font-size: 20px;
+  line-height: 27px;
+  margin: 0;
+  text-align: left;
+  color: #444;
+}
+
+.iurl-text {
+  text-align: center;
+  color: #888;
+  border-radius: 20px 20px 0 0;
+  font-size: 19px;
+  padding: 22px 10px 13px;
+  line-height: 28px;
+}
+
+.url-button {
+  padding-bottom: 11px;
+}
+
+.url {
+  position: absolute;
+  bottom: 81px;
+}
+
+.pin-button {
+  padding: 10px 0 15px;
+}
+
+.iphone-open,
+.iphone-share,
+.iphone-copy,
+.iphone-cancel {
+  font-size: 30px;
+  padding: 23px;
+}
+
+.iphone-open,
+.iphone-share,
+.iphone-copy,
+.iurl-text,
+.iphone-cancel {
+  margin-left: 12px;
+  margin-right: 12px;
+}
+
+.iphone-open,
+.iphone-share,
+.iphone-copy,
+.iurl-text {
+  background: #eee;
+}
+
+.iphone-open,
+.iphone-share,
+.iurl-text {
+  margin-bottom: 2px;
+}
+
+.iphone-copy {
+  border-radius: 0 0 20px 20px;
+  margin-bottom: 13px;
+}
+
+.iphone-cancel {
+  font-weight: bold;
+  background: #fff;
+  border-radius: 20px;
+  margin-bottom: 14px;
+  cursor: pointer;
+}
+
+.tooltip {
+  display: none;
+  opacity: 0;
+}

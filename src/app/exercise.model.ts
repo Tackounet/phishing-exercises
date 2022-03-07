@@ -11,10 +11,21 @@ export interface Exercise {
   toDisplayName: string;
   toEmail: string;
   body: string;
-  rightAnswer: string;
-  wrongAnswer: string;
-  answers: [{
-    id: string;
+  legitimate: boolean;
+  rightAnswer: {
     text: string;
-  }] | undefined | null;
+    items: {
+      id: string;
+      text: string;
+      score: number;
+    }[];
+  };
+  wrongAnswer: {
+    text: string;
+    items: {
+      id: string;
+      text: string;
+      score: number;
+    }[];
+  };
 }

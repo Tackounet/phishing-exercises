@@ -1,17 +1,19 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild, Input, AfterViewChecked } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, AfterViewChecked } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Exercise } from '../exercise.model';
 import { LibraryService } from '../library.service';
+import { Result } from '../result.model';
+import { Score } from '../score.model';
+import { Trainee } from '../trainee.model';
 
 declare const bootstrap: any
 
 @Component({
-  selector: 'app-exercise',
-  templateUrl: './exercise.component.html',
-  styleUrls: ['./exercise.component.css']
+  selector: 'app-list-exercise',
+  templateUrl: './list-exercise.component.html',
+  styleUrls: ['./list-exercise.component.css']
 })
-export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class ListExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('main') main!: ElementRef;
   @ViewChild('urlText') urlText!: ElementRef;
   @ViewChild('blackScreenImage') blackScreenImage!: ElementRef;
@@ -22,14 +24,12 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('buttons') buttons!: ElementRef;
   @ViewChild('btnLegitimate') btnLegitimate!: ElementRef;
   @ViewChild('btnSuspicious') btnSuspicious!: ElementRef;
+  @ViewChild('btnNext') btnNext!: ElementRef;
   @ViewChild('btnValidate') btnValidate!: ElementRef;
-  @ViewChild('email') email!: ElementRef;
-  @ViewChild('proposal') proposal!: ElementRef;
-
-  @Input() exercisePreview!: Exercise;
 
   private timeoutId?: ReturnType<typeof setTimeout>;
   private exerciseTimeout?: ReturnType<typeof setTimeout>;
+  private timeout: number = 30000;
   private mouseDown: boolean = false;
   private timeoutMouse?: ReturnType<typeof setTimeout>;
   private pointSuccessLegitimate: number = 10;
@@ -39,6 +39,7 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
   template: number = 0;
   private contentIsLoaded = false;
   private exercisesSub: Subscription = Subscription.EMPTY;
+  private exercises: Exercise[] = [];
   exercise: Exercise = {
     id: '',
     template: 0,
@@ -62,117 +63,58 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
       items: []
     }
   };
-  private id: string = '';
   private y: number = 0;
   private numberOfClickedItems: number = 0;
   private lockClock = 0;
   private delay = 500;
+  private currentExercise: number = 0;
+  private exercisesNumber: number = 0;
   senderColor: string = this.generateHTMLColor();
   private exerciseScore: number = 0;
+  totalScore: number = 0;
+  private sessionId: string = '';
+  trainee: Trainee = {
+    id: '',
+    name: ''
+  };
   private isCorrect: boolean | null = null;
   private isPhishing: boolean | null = null;
   deploy = false;
-  private isPreview = false;
 
-  constructor(private route: ActivatedRoute, private libraryService: LibraryService, private elRef: ElementRef) { }
+  constructor(private libraryService: LibraryService) { }
 
   ngAfterViewChecked(): void {
-    console.log('ngAfterViewChecked');
     this.loadAllContent();
   }
 
   loadAllContent() {
     if (this.contentIsLoaded) { return; }
-    const loaded = this.email.nativeElement.querySelectorAll('#loaded');
+    const loaded = document.getElementById('loaded');
     if (loaded) {
       this.initBody(this);
       this.contentIsLoaded = true;
-      loaded[0].remove();
+      loaded.remove();
       console.log('loaded');
-      this.proposal.nativeElement.querySelectorAll('.proposal').forEach((e: HTMLElement) => {
-        e.style.opacity = '0';
+      document.querySelectorAll('.proposal').forEach(e => {
+        (e as HTMLElement).style.opacity = '0';
       });
-      if (this.exercisePreview) {
-        this.displayButtons('block');
-      }
     } else {
       console.log('not loaded');
     }
   }
 
-  private loadExercise() {
-    this.libraryService.getExercise(this.id).subscribe(response => {
-      this.exercise = response.exercise;
-      this.exerciseScore = 0;
-      this.template = this.exercise.template;
-      this.exercise.body = this.libraryService.render(this.exercise.body);
-      this.exercise.object = this.libraryService.render(this.exercise.object);
-      this.exercise.description = this.libraryService.render(this.exercise.description);
-      this.exercise.toDisplayName = this.libraryService.render(this.exercise.toDisplayName);
-      // console.log(context.exercise);
-    });
-    // this.exercisesSub = this.libraryService.getExerciseListener()
-    //   .subscribe((exercises: Exercise[]) => {
-    //     // this.loadAllContent();
-    //   });
-  }
-
   ngOnInit(): void {
-    // this.route.paramMap.subscribe((param: ParamMap) => {
-    //   this.createMode = !(param.has('id'));
-    //   if (this.createMode) {
-    //     this.id = null;
-    //   } else {
-    //     this.isLoading = true;
-    //     this.id = param.get('id');
-    //     this.campaignService.getCampaign(this.id).subscribe((campaign: { campaign: Campaign }) => {
-    //       this.campaign = campaign.campaign;
-    //       this.tags = this.campaign.tags
-    //       this.hide = this.campaign.hide;
-    //       this.form.patchValue({
-    //         title: this.campaign.title,
-    //         authors: this.campaign.authors,
-    //         description: this.campaign.description,
-    //         images: this.campaign.images,
-    //         mapsNumber: this.campaign.mapsNumber,
-    //         mapsStatus: this.campaign.mapsStatus,
-    //         mapsProgress: this.campaign.mapsProgress,
-    //         downloadInfo: this.campaign.downloadInfo,
-    //         source: this.campaign.source,
-    //         rate: this.campaign.rate,
-    //         tags: this.tags
-    //       });
-    //       for (let i = 1; i < this.campaign.images.length; ++i) {
-    //         this.addElement('images', this.campaign.images[i].link);
-    //       }
-    //       for (let i = 1; i < this.campaign.downloadInfo.length; ++i) {
-    //         this.addElement('downloadInfo', this.campaign.downloadInfo[i]);
-    //       }
-    //       this.isLoading = false;
-    //     });
-    //   }
-    // });
-
-
-    if (this.exercisePreview) {
-      console.log("init");
-      this.exerciseScore = 0;
-      console.log(this.exercisePreview);
-      this.exercise = this.exercisePreview;
-      this.template = this.exercise.template;
-      this.exercise.body = this.libraryService.render(this.exercise.body);
-      this.exercise.object = this.libraryService.render(this.exercise.object);
-      this.exercise.description = this.libraryService.render(this.exercise.description);
-      this.exercise.toDisplayName = this.libraryService.render(this.exercise.toDisplayName);
-      this.isPreview = true;
-    } else {
-      this.id = this.route.snapshot.params['id'];
-      this.loadExercise();
-      this.route.params.subscribe((params: Params) => {
-        this.id = params['id'];
-        this.loadExercise();
+    this.libraryService.getExercises();
+    this.exercisesSub = this.libraryService.getExercisesListener()
+    .subscribe((exercises: Exercise[]) => {
+        console.log("sub");
+        this.exercises = this.shuffleArray(exercises);
+        this.exercisesNumber = this.exercises.length;
+        this.setExercise(this);
+        const timeExpiration = () => this.displayStats();
+        this.exerciseTimeout = setTimeout(timeExpiration, this.timeout);
+        // this.loadAllContent();
       });
-    }
   }
 
   ngOnDestroy(): void {
@@ -181,14 +123,42 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
-  // private setExercise(context: any) {
-  //   context.exerciseScore = 0;
-  //   context.exercise = context.exercises[context.currentExercise];
-  //   context.template = parseInt(context.exercise.template);
-  //   context.exercise.body = this.libraryService.render(context.exercise.body);
-  //   context.exercise.object = this.libraryService.render(context.exercise.object);
-  //   console.log(context.exercise);
-  // }
+  private setExercise(context: any) {
+    context.exerciseScore = 0;
+    context.exercise = context.exercises[context.currentExercise];
+    console.log(context.exercise.body);
+    context.template = parseInt(context.exercise.template);
+    context.exercise.body = context.libraryService.render(context.exercise.body);
+    context.exercise.object = context.libraryService.render(context.exercise.object);
+    context.exercise.description = context.libraryService.render(context.exercise.description);
+    console.log(context.exercise);
+  }
+
+  private shuffleArray(array: Exercise[]) {
+    let curId: number = array.length;
+    while (0 !== curId) {
+      const randId = Math.floor(Math.random() * curId);
+      curId -= 1;
+      const tmp = array[curId];
+      array[curId] = array[randId];
+      array[randId] = tmp;
+    }
+    return array;
+  }
+
+  private sendScore() {
+    const result: Result = {
+      exerciseId: this.exercise.id,
+      exerciseTitle: this.exercise.title,
+      userId: this.trainee.id,
+      userName: this.trainee.name,
+      sessionId: this.sessionId,
+      score: this.exerciseScore,
+      isCorrect: this.isCorrect,
+      isPhishing: this.isPhishing
+    };
+    this.libraryService.sendExerciseScore(result);
+  }
 
   private onDeploy(d: Event) {
     console.log("deploy");
@@ -197,19 +167,19 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
       e = e?.parentElement;
     }
     let classes = e.className.replaceAll(/ +/g, ' ').split(' ');
-    const fold = this.email.nativeElement.querySelectorAll(".fold");
-    const unfold = this.email.nativeElement.querySelectorAll(".unfold");
+    const fold = document.querySelectorAll(".fold");
+    const unfold = document.querySelectorAll(".unfold");
     if (classes.includes('deployed')) {
       classes = classes.filter(e => e !== 'deployed');
       e.className = classes.join(' ') + ' undeployed';
-      fold.forEach((e: HTMLElement) => e.style.display = 'inline-block');
-      unfold.forEach((e: HTMLElement) => e.style.display = 'none');
+      fold.forEach(e => (e as HTMLElement).style.display = 'inline-block');
+      unfold.forEach(e => (e as HTMLElement).style.display = 'none');
       console.log("fold");
     } else {
       classes = classes.filter(e => e !== 'undeployed');
       e.className = classes.join(' ') + ' deployed';
-      fold.forEach((e: HTMLElement) => e.style.display = 'none');
-      unfold.forEach((e: HTMLElement) => e.style.display = 'inline-block');
+      fold.forEach(e => (e as HTMLElement).style.display = 'none');
+      unfold.forEach(e => (e as HTMLElement).style.display = 'inline-block');
       console.log("unfold");
     }
     console.log("done");
@@ -249,29 +219,30 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
     context.btnLegitimate.nativeElement.style.display = 'inline';
     context.btnSuspicious.nativeElement.style.display = 'inline';
     context.btnValidate.nativeElement.style.display = 'none';
+    context.btnNext.nativeElement.style.display = 'none';
     context.answer.nativeElement.innerHTML = '';
     context.response.nativeElement.innerHTML = '';
     context.statement.nativeElement.style.height = '0px';
     context.response.nativeElement.opacity = 0;
 
     if (context.template !== 0) {
-      this.email.nativeElement.querySelectorAll('[data-bs-toggle]').forEach((e: HTMLElement) => {
+      document.querySelectorAll('[data-bs-toggle]').forEach((e) => {
         const title = e.getAttribute('title');
         const t = title === null ? '' : title;
         e.setAttribute('bs-title', t);
         e.removeAttribute('title');
-        e.addEventListener('mousedown', (e: Event) => context.showUrl(e, context));
-        e.addEventListener('touchstart', (e: Event) => context.showUrl(e, context));
+        e.addEventListener('mousedown', e => context.showUrl(e, context));
+        e.addEventListener('touchstart', e => context.showUrl(e, context));
         e.addEventListener('mouseup', () => context.clearUrl(context));
         e.addEventListener('mouseleave', () => context.clearUrl(context));
         e.addEventListener('touchend', () => context.clearUrl(context));
         e.addEventListener('touchleave', () => context.clearUrl(context));
       });
-      this.email.nativeElement.querySelectorAll('[fn="deployable"]').forEach((e: HTMLElement) => {
+      document.querySelectorAll('[fn="deployable"]').forEach(e => {
         e.addEventListener('mouseup', context.onDeploy);
       });
     } else {
-      const tooltipTriggerList = [].slice.call(this.email.nativeElement.querySelectorAll('[data-bs-toggle="tooltip"]'))
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
       tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
       });
@@ -322,8 +293,8 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
         that.statement.nativeElement.style.height = 0 + 'px';
         setTimeout(function () {
           ++that.y;
-          that.main.nativeElement.querySelectorAll('[class*=show-]').forEach((e: HTMLElement) => e.classList.remove('hidden'));
-          that.main.nativeElement.querySelectorAll('.show-' + that.y).forEach((e: HTMLElement) => e.classList.remove('hidden'));
+          document.querySelectorAll('[class*=show-]').forEach(e => e.classList.remove('hidden'));
+          document.querySelectorAll('.show-' + that.y).forEach(e => e.classList.remove('hidden'));
           that.expandStatement(that);
         }, 200);
       });
@@ -340,15 +311,17 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.isCorrect = true;
       this.isPhishing = false;
       this.exerciseScore = this.pointSuccessLegitimate;
+      this.totalScore += this.exerciseScore;
+      this.sendScore();
     } else {
       this.answer.nativeElement.innerHTML = this.exercise.wrongAnswer.text;
       this.isCorrect = false;
       this.isPhishing = true;
       this.exerciseScore = this.pointFailSuspicious;
+      this.totalScore += this.exerciseScore;
+      this.sendScore();
     }
-    if (this.isPreview) {
-      this.displayButtons('none');
-    }
+    this.swapButtons(this.btnNext);
     this.rewriteStatement();
   }
 
@@ -358,14 +331,14 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.answer.nativeElement.innerHTML = this.exercise.rightAnswer.text;
       this.exerciseScore += this.pointSuccessSuspicious;
       const that = this;
-      this.email.nativeElement.querySelectorAll('.clickable').forEach((e: HTMLElement) => {
-        e.style.cursor = 'pointer';
-        e.addEventListener('mousedown', (e: Event) => {
+      document.querySelectorAll('.clickable').forEach(e => {
+        (e as HTMLElement).style.cursor = 'pointer';
+        e.addEventListener('mousedown', e => {
           that.mouseDown = true;
           e.stopPropagation();
           that.timeoutMouse = setTimeout(() => that.mouseDown = false, 500, e);
         });
-        e.addEventListener('mouseup', (e: Event) => {
+        e.addEventListener('mouseup', e => {
           if (that.mouseDown) {
             that.mouseDown = false;
             window.clearTimeout(that.timeoutMouse);
@@ -373,33 +346,28 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
           }
         });
       });
-      this.proposal.nativeElement.querySelectorAll('.proposal').forEach((e: HTMLElement) => {
-        e.style.opacity = '1';
-      });
       this.btnValidate.nativeElement.disabled = true;
     } else {
       this.answer.nativeElement.innerHTML = this.exercise.wrongAnswer.text;
       this.isCorrect = false;
       this.isPhishing = false;
       this.exerciseScore = this.pointFailLegitimate;
-      if (this.isPreview) {
-        this.displayButtons('none');
-      }
+      this.totalScore += this.exerciseScore;
+      this.sendScore();
+      this.swapButtons(this.btnNext);
     }
     this.rewriteStatement();
   }
 
   toValidate() {
-    if (this.isPreview) {
-      this.displayButtons('none');
-    }
-    this.email.nativeElement.querySelectorAll('.clickable').forEach((e: HTMLElement) => {
-      e.style.cursor = 'auto';
+    this.swapButtons(this.btnNext);
+    document.querySelectorAll('.clickable').forEach(e => {
+      (e as HTMLElement).style.cursor = 'auto';
     });
-    // this.email.nativeElement.querySelectorAll('.clickable').forEach((e: HTMLElement) => {
-    //   const new_element = e.cloneNode(true);
-    //   e.parentNode?.replaceChild(new_element, e);
-    // });
+    document.querySelectorAll('.clickable').forEach(e => {
+      const new_element = e.cloneNode(true);
+      e.parentNode?.replaceChild(new_element, e);
+    });
     const allRightAnswers: any = {};
     const allWrongAnswers: any = {};
     if (this.exercise.rightAnswer.items) {
@@ -417,19 +385,16 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
       });
     }
 
-    this.main.nativeElement.querySelectorAll('.clicked').forEach((e: HTMLElement) => {
+    document.querySelectorAll('.clicked').forEach(e => {
       const attr: string | null = e.getAttribute('answer');
       const answer: string = attr === null ? '' : attr;
       const color = (answer in allRightAnswers) ? '#64f3b0' : '#ffa4a4';
       if (e.classList.contains('clickable')) {
-        e.style.outline = color + ' solid 2px';
-        e.style.backgroundColor = color;
-      } else if (e.classList.contains('proposal')) {
-        e.getElementsByTagName('label')[0].style.backgroundColor = color;
-        e.getElementsByTagName('label')[0].style.color = '#212529';
+        (e as HTMLElement).style.outline = color + ' solid 2px';
+        (e as HTMLElement).style.backgroundColor = color;
       } else {
-        Array.from(e.children).forEach(element => {
-          e.style.backgroundColor = color;
+        Array.from((e as HTMLElement).children).forEach(element => {
+          (element as HTMLElement).style.backgroundColor = color;
         });
       }
     });
@@ -445,7 +410,7 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
   writeResponse(allRightAnswers: any, allWrongAnswers: any) {
     const rightAnswers = [];
     const wrongAnswers = [];
-    const allClickedElements = this.email.nativeElement.getElementsByClassName('clicked');
+    const allClickedElements = document.getElementsByClassName('clicked');
 
     let displayWrongAnswer = false;
     let displayDefaultWrongAnswer = false;
@@ -478,7 +443,8 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     if (displayWrongAnswer) {
       if (message !== '') {
-        message += '.</span> <span style="color:#f33">However';
+        message +=
+          '.</span> <span style="color:#f33">However';
       } else {
         message = '<p><span style="color:#f33">Sorry';
       }
@@ -504,23 +470,13 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     this.isPhishing = true;
+    this.totalScore += this.exerciseScore;
+    this.sendScore();
     return message + '.</span></p>';
   }
 
-  switchClick(e: Event) {
-    console.log('switch');
-    this.turnClick(e, this);
-  }
-
   turnClick(e: Event, context: any) {
-    console.log('turn');
-    let element: HTMLElement | null | undefined = (e.target as HTMLElement);
-    while (!element?.getAttribute('answer') && element?.className !== 'template') {
-      element = element?.parentElement;
-    }
-    console.log('click');
-    if (element.className === 'template') { return; }
-    console.log('clicked?');
+    const element = (e.target as HTMLElement);
     if (element.classList.contains('clicked')) {
       --context.numberOfClickedItems;
       console.log('remove answer: ' + element.getAttribute('answer'));
@@ -533,7 +489,6 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
       element.classList.add('clicked');
     }
     e.stopPropagation();
-    console.log('validate?');
     context.btnValidate.nativeElement.disabled = context.numberOfClickedItems == 0;
   }
 
@@ -542,14 +497,41 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   private swapButtons(btnRef: ElementRef) {
-    const btn = this.buttons.nativeElement.querySelectorAll(".btn-nav");
-    btn.forEach((e: HTMLElement) => e.style.opacity = '0');
+    const btn = document.querySelectorAll(".btn-nav");
+    btn.forEach(e => (e as HTMLElement).style.opacity = '0');
     setTimeout(function () {
-      btn.forEach((e: HTMLElement) => e.style.display = 'none');
+      btn.forEach(e => (e as HTMLElement).style.display = 'none');
       btnRef.nativeElement.style.display = 'inline';
       setTimeout(function () {
         btnRef.nativeElement.style.opacity = '1';
       }, 200);
     }, 200);
   }
+
+  private displayStats() {
+    console.log(this.totalScore);
+    const stats: Score = {
+      sessionId: this.sessionId,
+      userId: this.trainee.id,
+      userName: this.trainee.name,
+      score: this.totalScore
+    };
+    this.libraryService.sendStats(stats);
+  }
+
+  goToNextPage() {
+    if (this.lockClock < (Date.now() - this.delay)) {
+      this.lockClock = Date.now();
+      ++this.currentExercise;
+      if (this.currentExercise < this.exercisesNumber) {
+        this.main.nativeElement.style.opacity = 0;
+        this.contentIsLoaded = false;
+        const that = this;
+        setTimeout(this.setExercise, 500, that);
+      } else {
+        this.displayStats();
+      }
+    }
+  }
 }
+

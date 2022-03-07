@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-// import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { NoSanitizePipe } from './no-sanitize.pipe';
 
@@ -12,18 +11,23 @@ import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { ExerciseComponent } from './exercise/exercise.component';
+import { ExercisesComponent } from './exercises/exercises.component';
+import { ListExerciseComponent } from './list-exercise/list-exercise.component';
+import { CreateSessionComponent } from './session/create-session/create-session.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ExerciseComponent,
+    ExercisesComponent,
+    ListExerciseComponent,
     CreateExerciseComponent,
     AuthComponent,
     SignupComponent,
-    NoSanitizePipe
+    NoSanitizePipe,
+    CreateSessionComponent
   ],
   imports: [
-    // CommonModule,
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,

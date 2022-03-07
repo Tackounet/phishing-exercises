@@ -1,3 +1,7 @@
 .proposal label {
   width: 100%;
 }
+
+.title {
+  margin-left: 10px;
+}

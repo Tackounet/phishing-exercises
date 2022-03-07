@@ -1,0 +1,9 @@
+<div class="row">
+  <label for="username" class="col-auto col-form-label">New session UUID:</label>
+  <div class="col">
+    <input type="text" readonly class="form-control-plaintext" id="username" [value]="uuid">
+  </div>
+  <div class="col-auto">
+    <button (click)="register()" class="btn btn-primary mb-3">Register</button>
+  </div>
+</div>

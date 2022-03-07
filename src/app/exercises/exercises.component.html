@@ -1,4 +1,40 @@
-<div #main class="template" style="opacity:1">
+<div *ngIf="!exerciseStarted">
+  <div class="row">
+    <label for="username" class="col-auto col-form-label">{{registerText}}:</label>
+    <div class="col">
+      <input type="text" class="form-control" id="username" [(ngModel)]="username" (keyup.enter)="register()">
+    </div>
+    <div class="col-auto">
+      <button (click)="register()" class="btn btn-primary mb-3">{{registerButton}}</button>
+    </div>
+  </div>
+  <div *ngIf="userRegistered">
+    <div class="row">
+      <div class="col"><p>Hello <strong>{{trainee.name}}</strong>,</p>
+      <p>Welcome to the practical phishing training.</p>
+      <p>You have <strong>{{duration}} minute{{duration > 1 ? 's' : ''}}</strong> to analyze <strong>{{exercisesNumber}}
+          email{{exercisesNumber > 1 ? 's' : ''}}</strong>.</p>
+      <p>You will be asked to recognize if the email is legitimate or a phishing attempt.</p>
+      <p>In case the email is indeed a phishing attempt, you will have to select the elements allowing you to determine that
+        the email was malicious. An element could be a sentence, a link, a button, an image…</p>
+      <p>Each of your selected elements will be inside a yellow frame. If you want to remove an element from your selection,
+        you can click again on it, the yellow frame will be removed.</p>
+      <p>You will also have other elements that you can select to qualify the suspiciousness of the email, such as a wrong
+        visual guide, a fake urgency situation…</p>
+      <p><strong>Once you are satisfied with your selection, you will have to click on the "Validate" button</strong>. A
+        message will be displayed to confirm if the elements that you selected were indeed suspicious enough.</p>
+      <p>Click on the "Start" button to start the exercises and the counter ({{duration}} minute{{duration > 1 ? 's' : ''}}).
+      </p></div>
+      <div class="col-auto"><img src='./assets/images/home-exercise.png'></div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <button (click)="start()" class="btn btn-primary mb-3">Start</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div #main class="template" style="opacity:1" *ngIf="userRegistered && exerciseStarted && !terminate">
   <div class="part body">
     <div class="container">
       <h4>{{exercise.title}}</h4>
@@ -11,7 +47,7 @@
           <div class="col-12" style="text-align:center;margin-bottom:10px" #response></div>
         </div>
       </div>
-      <div class="w-100" style="text-align:center;margin-bottom:10px" #buttons><button class="btn btn-nav btn-success" #btnLegitimate (click)="isLegitimate()" type="button">Legitimate</button> <button class="btn btn-nav btn-danger" #btnSuspicious (click)="isSuspicious()" type="button">Suspicious</button> <button class="btn btn-nav btn-primary" #btnValidate (click)="toValidate()" type="button">Validate</button></div>
+      <div class="w-100" style="text-align:center;margin-bottom:10px" #buttons><button class="btn btn-nav btn-success" #btnLegitimate (click)="isLegitimate()" type="button">Legitimate</button> <button class="btn btn-nav btn-danger" #btnSuspicious (click)="isSuspicious()" type="button">Suspicious</button> <button class="btn btn-nav btn-primary" #btnValidate (click)="toValidate()" type="button">Validate</button> <button class="btn btn-nav btn-primary" #btnNext (click)="goToNextPage()" type="button">Next</button></div>
     </div>
   </div>
   <div class="part">
@@ -38,8 +74,7 @@
                 </svg>
                 <div style="padding-left:15px;flex-shrink:1;flex-grow:1"><span class="clickable" answer="a3"
                     style="font-size:16px">{{exercise.senderDisplayName}}</span> <span class="clickable text-muted" answer="a4"
-                    style="font-size:16px">&lt;{{exercise.senderEmail}}&gt;</span><br><span style="font-size:14px">To</span>&nbsp;<span class="clickable" answer="a5"
-                    style="font-size:14px" [innerHTML]="exercise.toDisplayName | noSanitize"></span></div>
+                    style="font-size:16px">&lt;{{exercise.senderEmail}}&gt;</span><br><span style="font-size:14px">To</span>&nbsp;<span class="clickable" answer="a5" style="font-size:14px" [innerHTML]="exercise.toDisplayName | noSanitize"></span></div>
                 <div style="min-width:60px;order:1"><br><span class="clickable text-muted" answer="a6" style="font-size:14px">{{exercise.time}}</span>
                 </div>
               </div>
@@ -196,4 +231,9 @@
       </div>
     </div>
   </div>
+</div>
+<div *ngIf="userRegistered && exerciseStarted && terminate">
+  <h4>{{endMessage}}</h4>
+  <p>Number of correct analysis: {{correctAnalysisNumber}} / {{exercisesNumber}}</p>
+  <p>Your score: {{totalScore}} Point{{totalScore > 1 ? 's' : ''}}</p>
 </div>
