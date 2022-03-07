@@ -1,3 +1,4 @@
-.proposal label {
-  width: 100%;
+.exercise-section {
+  transition: opacity 0.5s;
+  opacity: 0;
 }
