@@ -5,6 +5,7 @@ export interface Result {
   traineeName: string;
   sessionId: string;
   score: number;
+  answers: string[];
   isCorrect: boolean | null;
   isPhishing: boolean | null;
 }

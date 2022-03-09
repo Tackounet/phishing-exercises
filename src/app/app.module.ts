@@ -14,6 +14,8 @@ import { ExerciseComponent } from './exercise/exercise.component';
 import { ExercisesComponent } from './exercises/exercises.component';
 import { ListExerciseComponent } from './list-exercise/list-exercise.component';
 import { CreateSessionComponent } from './session/create-session/create-session.component';
+import { ResultsComponent } from './results/results.component';
+import { LoadExerciseComponent } from './load-exercise/load-exercise.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +27,9 @@ import { CreateSessionComponent } from './session/create-session/create-session.
     AuthComponent,
     SignupComponent,
     NoSanitizePipe,
-    CreateSessionComponent
+    CreateSessionComponent,
+    ResultsComponent,
+    LoadExerciseComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,6 @@
+<div *ngIf="!display">
+  Exercise not found
+</div>
+<div *ngIf="display">
+  <app-exercise [exercisePreview]="exercise"></app-exercise>
+</div>

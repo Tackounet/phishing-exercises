@@ -11,3 +11,7 @@ textarea.ng-invalid {
   margin-top: 20px;
   border: 1px solid #777;
 }
+
+.validate-btn-section .btn {
+  width: 80px;
+}

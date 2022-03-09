@@ -18,13 +18,9 @@ export class ExercisesComponent implements OnInit, OnDestroy {
   @ViewChild('exerciseSection') exerciseSection!: ElementRef;
 
   duration: number = 5;
-  private timeoutId?: ReturnType<typeof setTimeout>;
   private exerciseTimeout?: ReturnType<typeof setTimeout>;
   private timeout: number = this.duration * 60000 + 10000;
-  private mouseDown: boolean = false;
-  private timeoutMouse?: ReturnType<typeof setTimeout>;
   template: number = 0;
-  private contentIsLoaded = false;
   private exercisesSub: Subscription = Subscription.EMPTY;
   private exercises: Exercise[] = [];
   exercise: Exercise = {
@@ -51,12 +47,8 @@ export class ExercisesComponent implements OnInit, OnDestroy {
     }
   };
   private y: number = 0;
-  private numberOfClickedItems: number = 0;
-  private lockClock = 0;
-  private delay = 500;
   private currentExercise: number = 0;
   exercisesNumber: number = 0;
-  private exerciseScore: number = 0;
   totalScore: number = 0;
   private sessionId: string = '';
   trainee: Trainee = {
@@ -84,15 +76,12 @@ export class ExercisesComponent implements OnInit, OnDestroy {
     this.libraryService.getExercises();
     this.exercisesSub = this.libraryService.getExercisesListener()
     .subscribe((exercises: Exercise[]) => {
-        console.log("sub");
-        this.exercises = this.shuffleArray(exercises);
-        this.exercisesNumber = this.exercises.length;
-        this.exercise = this.exercises[0];
+      this.exercises = this.shuffleArray(exercises);
+      this.exercisesNumber = this.exercises.length;
+      this.exercise = this.exercises[0];
     });
     this.libraryService.getSession().subscribe(response => {
-      console.log(response.message);
       this.sessionId = response.sessionId;
-      console.log('session: ' + this.sessionId);
     });
   }
 
@@ -129,7 +118,7 @@ export class ExercisesComponent implements OnInit, OnDestroy {
     return array;
   }
 
-  private sendScore(data: { score: number, isCorrect: boolean | null }) {
+  private sendScore(data: { score: number, isCorrect: boolean | null, answers: string[] }) {
     const result: Result = {
       exerciseId: this.exercise.id,
       exerciseTitle: this.exercise.title,
@@ -137,6 +126,7 @@ export class ExercisesComponent implements OnInit, OnDestroy {
       traineeName: this.trainee.name,
       sessionId: this.sessionId,
       score: data.score,
+      answers: data.answers,
       isCorrect: data.isCorrect,
       isPhishing: this.isPhishing
     };
@@ -144,7 +134,6 @@ export class ExercisesComponent implements OnInit, OnDestroy {
   }
 
   private displayStats() {
-    console.log(this.totalScore);
     this.terminate = true;
     const stats: Score = {
       sessionId: this.sessionId,
@@ -155,12 +144,13 @@ export class ExercisesComponent implements OnInit, OnDestroy {
     this.libraryService.sendStats(stats);
   }
 
-  goToNextPage(data: { score: number, isCorrect: boolean | null}) {
-    ++this.currentExercise;
+  goToNextPage(data: { score: number, isCorrect: boolean | null, answers: string[]}) {
     this.totalScore += data.score;
+    this.isPhishing = !this.exercises[this.currentExercise].legitimate;
     if (data.isCorrect) {
       ++this.correctAnalysisNumber;
     }
+    ++this.currentExercise;
     this.sendScore(data);
     if (this.currentExercise < this.exercisesNumber) {
       const swapExercices = () => {

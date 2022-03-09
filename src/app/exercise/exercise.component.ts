@@ -3,7 +3,6 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Exercise } from '../exercise.model';
 import { LibraryService } from '../library.service';
-import { Result } from '../result.model';
 
 declare const bootstrap: any
 
@@ -28,7 +27,7 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('email') email!: ElementRef;
   @ViewChild('proposal') proposal!: ElementRef;
 
-  @Output() finish = new EventEmitter<{ score: number, isCorrect: boolean | null}>();
+  @Output() finish = new EventEmitter<{ score: number, isCorrect: boolean | null, answers: string[]}>();
 
   @Input() exercisePreview!: Exercise;
   @Input() preview: boolean = true;
@@ -78,11 +77,11 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
   private isPhishing: boolean | null = null;
   deploy = false;
   private isPreview = false;
+  private answers: string[] = [];
 
   constructor(private route: ActivatedRoute, private libraryService: LibraryService, private elRef: ElementRef) { }
 
   ngAfterViewChecked(): void {
-    console.log('ngAfterViewChecked');
     this.loadAllContent();
   }
 
@@ -93,15 +92,12 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.initBody();
       this.contentIsLoaded = true;
       loaded[0].remove();
-      console.log('loaded');
       this.proposal.nativeElement.querySelectorAll('.proposal').forEach((e: HTMLElement) => {
         e.style.opacity = '0';
       });
       if (this.preview) {
         this.displayButtons('block');
       }
-    } else {
-      console.log('not loaded');
     }
   }
 
@@ -119,9 +115,7 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   ngOnInit(): void {
     if (this.exercisePreview) {
-      console.log("init");
       this.exerciseScore = 0;
-      console.log(this.exercisePreview);
       this.exercise = this.exercisePreview;
       this.template = this.exercise.template;
       this.exercise.body = this.libraryService.render(this.exercise.body);
@@ -145,25 +139,12 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
-  // private setExercise(context: any) {
-  //   context.exerciseScore = 0;
-  //   context.exercise = context.exercises[context.currentExercise];
-  //   context.template = parseInt(context.exercise.template);
-  //   context.exercise.body = this.libraryService.render(context.exercise.body);
-  //   context.exercise.object = this.libraryService.render(context.exercise.object);
-  //   console.log(context.exercise);
-  // }
-
   private onDeploy(d: Event, context: any) {
-    console.log(d);
-    console.log("deploy");
     let e: HTMLElement | null | undefined = (d.target as HTMLElement);
     while (e?.getAttribute('fn') !== "deployable" && e?.className !== 'template') {
-      console.log(e);
       e = e?.parentElement;
     }
     let classes = e.className.replaceAll(/ +/g, ' ').split(' ');
-    console.log(context.email);
     const fold = context.email.nativeElement.querySelectorAll(".fold");
     const unfold = context.email.nativeElement.querySelectorAll(".unfold");
     if (classes.includes('deployed')) {
@@ -171,22 +152,17 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
       e.className = classes.join(' ') + ' undeployed';
       fold.forEach((e: HTMLElement) => e.style.display = 'inline-block');
       unfold.forEach((e: HTMLElement) => e.style.display = 'none');
-      console.log("fold");
     } else {
       classes = classes.filter(e => e !== 'undeployed');
       e.className = classes.join(' ') + ' deployed';
       fold.forEach((e: HTMLElement) => e.style.display = 'none');
       unfold.forEach((e: HTMLElement) => e.style.display = 'inline-block');
-      console.log("unfold");
     }
-    console.log("done");
   }
 
   private displayUrl(e: any, context: any) {
     let node = e;
-    console.log('display');
     while (!node.getAttribute('data-bs-toggle') && node.className !== 'template') {
-      console.log(node.className);
       node = node.parentElement;
     }
     context.urlText.nativeElement.innerText = node.getAttribute('bs-title');
@@ -426,14 +402,19 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
     for (let i = 0; i < allClickedElements.length; ++i) {
       const answer = allClickedElements[i].getAttribute('answer');
       const a: string = (answer === null) ? '' : answer;
+      this.answers.push(a);
       if (allRightAnswers[a]) {
         this.isCorrect = true;
-        rightAnswers.push(allRightAnswers[a].text);
+        if (allRightAnswers[a].text && allRightAnswers[a].text !== 'ignore' && allRightAnswers[a].text !== '') {
+          rightAnswers.push(allRightAnswers[a].text);
+        }
         this.exerciseScore += allRightAnswers[a].score;
       } else if (allWrongAnswers[a]) {
-        wrongAnswers.push(allWrongAnswers[a].text);
+        if (allWrongAnswers[a].text && allWrongAnswers[a].text !== 'ignore' && allWrongAnswers[a].text !== '') {
+          wrongAnswers.push(allWrongAnswers[a].text);
+          displayWrongAnswer = true;
+        }
         this.exerciseScore -= allWrongAnswers[a].score;
-        displayWrongAnswer = true;
       } else {
         this.exerciseScore -= 5;
         displayDefaultWrongAnswer = true;
@@ -466,12 +447,12 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     if (displayDefaultWrongAnswer) {
       if (displayWrongAnswer) {
-        message += '. The other elements you have selected are not suspicious enough'; // à revoir (Donald)
+        message += '. The other elements you have selected are not suspicious enough';
       } else {
         if (message !== '') {
-          message += '.</span> <span style="color:#f33">However, the other elements you have selected are not suspicious enough'; // à revoir (Donald)
+          message += '.</span> <span style="color:#f33">However, the other elements you have selected are not suspicious enough';
         } else {
-          message = '<p><span style="color:#f33">Unfortunately, the elements you have selected does not raise enough suspiciousness'; // à revoir (Donald)
+          message = '<p><span style="color:#f33">Unfortunately, the elements you have selected does not raise enough suspiciousness';
         }
       }
     }
@@ -481,32 +462,23 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   switchClick(e: Event) {
-    console.log('switch');
     this.turnClick(e, this);
   }
 
   turnClick(e: Event, context: any) {
-    console.log('turn');
     let element: HTMLElement | null | undefined = (e.target as HTMLElement);
     while (!element?.getAttribute('answer') && element?.className !== 'template') {
       element = element?.parentElement;
     }
-    console.log('click');
     if (element.className === 'template') { return; }
-    console.log('clicked?');
     if (element.classList.contains('clicked')) {
       --context.numberOfClickedItems;
-      console.log('remove answer: ' + element.getAttribute('answer'));
-      console.log('remove: ' + element);
       element.classList.remove('clicked');
     } else {
       ++context.numberOfClickedItems;
-      console.log('click answer: ' + element.getAttribute('answer'));
-      console.log('click: ' + element);
       element.classList.add('clicked');
     }
     e.stopPropagation();
-    console.log('validate?');
     context.btnValidate.nativeElement.disabled = context.numberOfClickedItems == 0;
   }
 
@@ -532,7 +504,8 @@ export class ExerciseComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.lockClock = Date.now();
       this.finish.emit({
         score: this.exerciseScore,
-        isCorrect: this.isCorrect
+        isCorrect: this.isCorrect,
+        answers: this.answers
       });
     }
   }

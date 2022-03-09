@@ -1,0 +1,68 @@
+<div class="row">
+  <div class="col-auto text-center">
+    <button #phishBtn type="submit" (click)="onPhish()" class="btn btn-primary btn-sm">All phishing emails</button>
+  </div>
+  <div class="col-auto text-center">
+    <button #topBtn type="button" (click)="onTop5()" class="btn btn-primary btn-sm">See the TOP 5</button>
+  </div>
+  <div class="col-auto text-center">
+    <button #allBtn type="button" (click)="onAllScores()" class="btn btn-primary btn-sm">All participant's scores</button>
+  </div>
+</div>
+
+<h1>There were {{total}} participant{{total > 1 ? 's' : ''}} during this session!</h1>
+<hr>
+<table *ngIf="path === ''" class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Exercise Title</th>
+      <th scope="col">Correct</th>
+      <th scope="col">Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let exercise of stats; index as i" (click)="navigate(exercise.id)">
+      <th scope="row">{{i + 1}}</th>
+      <td>{{exercise.title}}</td>
+      <td>{{exercise.correct}}</td>
+      <td>{{exercise.score}} Point{{exercise.score > 1 ? 's' : ''}}</td>
+    </tr>
+  </tbody>
+</table>
+<table *ngIf="path === 'top5'" class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Correct</th>
+      <th scope="col">Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let trainee of top5; index as i">
+      <th scope="row">{{i+ 1}}</th>
+      <td>{{trainee.name}}</td>
+      <td>{{trainee.correct}}</td>
+      <td>{{trainee.score}} Point{{trainee.score > 1 ? 's' : ''}}</td>
+    </tr>
+  </tbody>
+</table>
+<table *ngIf="path === 'all'" class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Correct</th>
+      <th scope="col">Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let trainee of allTrainees; index as i">
+      <th scope="row">{{i+ 1}}</th>
+      <td>{{trainee.name}}</td>
+      <td>{{trainee.correct}}</td>
+      <td>{{trainee.score}} Point{{trainee.score > 1 ? 's' : ''}}</td>
+    </tr>
+  </tbody>
+</table>

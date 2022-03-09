@@ -73,6 +73,10 @@ export class LibraryService {
       });
   }
 
+  getResults(sessionId: string) {
+    return this.http.get<{ message: string, results: Result[] }>(`${URL_BACKEND}/trainees/result/${sessionId}`);
+  }
+
   getExercisesListener() {
     return this.exercisesSubject.asObservable();
   }
@@ -109,14 +113,12 @@ export class LibraryService {
   }
 
   render(text: any) {
-    console.log("render: " + text);
     const re = /<<([^(]+)\(([^>]+)\)>>/g;
     let ret = text;
     let match;
     do {
       match = re.exec(text);
       if (match) {
-        console.log("test: " + match[0]);
         ret = ret.replaceAll(match[0], this.dispatch(this.decodeHTML(match[1]), JSON.parse(this.decodeHTML(match[2]))));
         this.dispatch(this.decodeHTML(match[1]), JSON.parse(this.decodeHTML(match[2])));
       }
